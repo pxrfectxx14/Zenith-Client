@@ -7,9 +7,9 @@ package dev.zenith.client.feature.hud;
  */
 public class FadingNotification {
 
-    private static final long FADE_IN_MS = 300;
-    private static final long HOLD_MS = 2000;
-    private static final long FADE_OUT_MS = 500;
+    private static final long FADE_IN_MS = 1000;
+    private static final long HOLD_MS = 1600;
+    private static final long FADE_OUT_MS = 1000;
     private static final long TOTAL_DURATION_MS = FADE_IN_MS + HOLD_MS + FADE_OUT_MS;
 
     private final String text;

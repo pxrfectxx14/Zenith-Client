@@ -4,10 +4,12 @@ import dev.zenith.client.feature.FeatureManager;
 import dev.zenith.client.feature.hud.BiomeNotifierFeature;
 import dev.zenith.client.feature.hud.FadingNotification;
 import dev.zenith.client.feature.hud.GameClockFeature;
+import dev.zenith.client.feature.hud.RealTimeClockFeature;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Optional;
@@ -21,6 +23,9 @@ public class ZenithClientClient implements ClientModInitializer {
         GameClockFeature gameClock = new GameClockFeature();
         FeatureManager.register(gameClock);
 
+        RealTimeClockFeature realTimeClock = new RealTimeClockFeature();
+        FeatureManager.register(realTimeClock);
+
         BiomeNotifierFeature biomeNotifier = new BiomeNotifierFeature();
         FeatureManager.register(biomeNotifier);
 
@@ -32,6 +37,7 @@ public class ZenithClientClient implements ClientModInitializer {
         });
 
         registerGameClockHud(gameClock);
+        registerRealTimeClockHud(realTimeClock);
         registerBiomeNotificationHud(biomeNotifier);
     }
 
@@ -42,12 +48,19 @@ public class ZenithClientClient implements ClientModInitializer {
                     if (!gameClock.isEnabled()) {
                         return;
                     }
-                    context.drawString(
-                            Minecraft.getInstance().font,
-                            gameClock.getStatusText(),
-                            10, 10,
-                            0xFFFFFFFF
-                    );
+                    drawGameClock(context, gameClock);
+                }
+        );
+    }
+
+    private void registerRealTimeClockHud(RealTimeClockFeature realTimeClock) {
+        HudElementRegistry.addLast(
+                ResourceLocation.fromNamespaceAndPath(MOD_ID, "real_time_clock"),
+                (context, tickCounter) -> {
+                    if (!realTimeClock.isEnabled()) {
+                        return;
+                    }
+                    drawRealTimeClock(context, realTimeClock);
                 }
         );
     }
@@ -70,7 +83,32 @@ public class ZenithClientClient implements ClientModInitializer {
         );
     }
 
-    private void drawFadingNotification(net.minecraft.client.gui.GuiGraphics context, FadingNotification notification) {
+    private void drawGameClock(GuiGraphics context, GameClockFeature gameClock) {
+        Minecraft client = Minecraft.getInstance();
+
+        float scale = 0.7f;
+        int color = 0xFFFFFFFF;
+        int lineSpacing = 10; // стандартный межстрочный интервал в Minecraft, до масштабирования
+
+        context.pose().pushMatrix();
+        context.pose().translate(10f, 26f);
+        context.pose().scale(scale, scale);
+        context.drawString(client.font, gameClock.getLabel(), 0, 0, color);
+        context.drawString(client.font, gameClock.getTimeRemaining(), 0, lineSpacing, color);
+        context.pose().popMatrix();
+    }
+
+    private void drawRealTimeClock(GuiGraphics context, RealTimeClockFeature realTimeClock) {
+        Minecraft client = Minecraft.getInstance();
+        context.drawString(
+                client.font,
+                realTimeClock.getFormattedTime(),
+                10, 10,
+                0xFFFFFFFF
+        );
+    }
+
+    private void drawFadingNotification(GuiGraphics context, FadingNotification notification) {
         Minecraft client = Minecraft.getInstance();
         String text = notification.getText();
 

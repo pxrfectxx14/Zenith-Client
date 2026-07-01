@@ -4,7 +4,9 @@ import dev.zenith.client.feature.ClientFeature;
 import net.minecraft.client.Minecraft;
 
 /**
- * Показывает, сколько игрового времени осталось до ночи или до рассвета.
+ * Отслеживает игровое время и готовит данные о том, сколько осталось
+ * до ночи или до рассвета. Ничего не знает о том, как это будет нарисовано —
+ * одна строка, две строки, какой шрифт и т.д. Это решает код отрисовки.
  */
 public class GameClockFeature extends ClientFeature {
 
@@ -12,34 +14,57 @@ public class GameClockFeature extends ClientFeature {
     private static final long NIGHT_START_TICK = 13000;
 
     public GameClockFeature() {
-        super("game_clock", true); // включена по умолчанию
+        super("game_clock", true);
     }
 
     /**
-     * Текст, который нужно нарисовать на экране.
-     * Возвращает пустую строку, если игрок не в мире (например, в меню).
+     * Текст метки: "До рассвета" ночью или "До ночи" днём.
+     * Пустая строка, если игрок не в мире (например, в меню).
      */
-    public String getStatusText() {
+    public String getLabel() {
+        ClockState state = computeState();
+        if (state == null) {
+            return "";
+        }
+        return state.isNight() ? "До рассвета" : "До ночи";
+    }
+
+    /**
+     * Оставшееся время в формате мм:сс.
+     */
+    public String getTimeRemaining() {
+        ClockState state = computeState();
+        if (state == null) {
+            return "";
+        }
+        return formatTime(state.ticksLeft());
+    }
+
+    private ClockState computeState() {
         Minecraft client = Minecraft.getInstance();
         if (client.level == null) {
-            return "";
+            return null;
         }
 
         long timeOfDay = client.level.getDayTime() % TICKS_PER_DAY;
         boolean isNight = timeOfDay >= NIGHT_START_TICK;
-
         long ticksLeft = isNight
-                ? TICKS_PER_DAY - timeOfDay      // сколько осталось до рассвета (полночь = 0)
-                : NIGHT_START_TICK - timeOfDay;  // сколько осталось до ночи
+                ? TICKS_PER_DAY - timeOfDay
+                : NIGHT_START_TICK - timeOfDay;
 
-        String label = isNight ? "До рассвета: " : "До ночи: ";
-        return label + formatTime(ticksLeft);
+        return new ClockState(isNight, ticksLeft);
     }
 
     private String formatTime(long ticks) {
-        long totalSeconds = ticks / 20; // в Minecraft 20 тиков = 1 реальная секунда
+        long totalSeconds = ticks / 20;
         long minutes = totalSeconds / 60;
         long seconds = totalSeconds % 60;
         return String.format("%02d:%02d", minutes, seconds);
     }
+
+    /**
+     * Небольшой неизменяемый контейнер для результата расчёта.
+     * Нужен только чтобы не дублировать арифметику выше в двух методах.
+     */
+    private record ClockState(boolean isNight, long ticksLeft) {}
 }
