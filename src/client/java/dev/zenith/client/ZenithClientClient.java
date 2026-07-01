@@ -4,13 +4,16 @@ import dev.zenith.client.feature.FeatureManager;
 import dev.zenith.client.feature.hud.BiomeNotifierFeature;
 import dev.zenith.client.feature.hud.FadingNotification;
 import dev.zenith.client.feature.hud.GameClockFeature;
+import dev.zenith.client.feature.hud.PvpHitsCounterFeature;
 import dev.zenith.client.feature.hud.RealTimeClockFeature;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionResult;
 
 import java.util.Optional;
 
@@ -36,9 +39,24 @@ public class ZenithClientClient implements ClientModInitializer {
             }
         });
 
+        PvpHitsCounterFeature pvpHitsCounter = new PvpHitsCounterFeature();
+        FeatureManager.register(pvpHitsCounter);
+
+        AttackEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
+            if (pvpHitsCounter.isEnabled()) {
+                pvpHitsCounter.registerHit();
+            }
+            return InteractionResult.PASS;
+        });
+
         registerGameClockHud(gameClock);
         registerRealTimeClockHud(realTimeClock);
         registerBiomeNotificationHud(biomeNotifier);
+
+        registerGameClockHud(gameClock);
+        registerRealTimeClockHud(realTimeClock);
+        registerBiomeNotificationHud(biomeNotifier);
+        registerPvpHitsCounterHud(pvpHitsCounter);
     }
 
     private void registerGameClockHud(GameClockFeature gameClock) {
@@ -81,6 +99,30 @@ public class ZenithClientClient implements ClientModInitializer {
                     drawFadingNotification(context, notification.get());
                 }
         );
+    }
+
+    private void registerPvpHitsCounterHud(PvpHitsCounterFeature pvpHitsCounter) {
+        HudElementRegistry.addLast(
+                ResourceLocation.fromNamespaceAndPath(MOD_ID, "pvp_hits_counter"),
+                (context, tickCounter) -> {
+                    if (!pvpHitsCounter.isEnabled()) {
+                        return;
+                    }
+                    drawPvpHitsCounter(context, pvpHitsCounter);
+                }
+        );
+    }
+
+    private void drawPvpHitsCounter(GuiGraphics context, PvpHitsCounterFeature pvpHitsCounter) {
+        Minecraft client = Minecraft.getInstance();
+        String text = "Hits: " + pvpHitsCounter.getHitCount();
+
+        int margin = 6;
+        int textWidth = client.font.width(text);
+        int x = client.getWindow().getGuiScaledWidth() - textWidth - margin;
+        int y = margin;
+
+        context.drawString(client.font, text, x, y, 0xFFFFFFFF);
     }
 
     private void drawGameClock(GuiGraphics context, GameClockFeature gameClock) {
