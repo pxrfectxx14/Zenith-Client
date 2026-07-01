@@ -52,10 +52,6 @@ public class ZenithClientClient implements ClientModInitializer {
         registerGameClockHud(gameClock);
         registerRealTimeClockHud(realTimeClock);
         registerBiomeNotificationHud(biomeNotifier);
-
-        registerGameClockHud(gameClock);
-        registerRealTimeClockHud(realTimeClock);
-        registerBiomeNotificationHud(biomeNotifier);
         registerPvpHitsCounterHud(pvpHitsCounter);
     }
 
