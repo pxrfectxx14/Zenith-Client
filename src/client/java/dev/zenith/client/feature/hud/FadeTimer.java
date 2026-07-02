@@ -2,35 +2,47 @@ package dev.zenith.client.feature.hud;
 
 /**
  * Отвечает только за тайминг анимации "появилось → подержалось → исчезло".
- * Не знает, ЧТО показывается — только КОГДА и с какой прозрачностью.
- * Используется любым уведомлением, которому нужна плавная анимация.
+ * Длительности можно задать через конструктор — так один и тот же класс
+ * подходит и для короткого уведомления (биом), и для долгого (урон).
  */
 public class FadeTimer {
 
-    private static final long FADE_IN_MS = 300;
-    private static final long HOLD_MS = 2000;
-    private static final long FADE_OUT_MS = 500;
-    private static final long TOTAL_DURATION_MS = FADE_IN_MS + HOLD_MS + FADE_OUT_MS;
+    private final long fadeInMs;
+    private final long holdMs;
+    private final long fadeOutMs;
+    private final long totalDurationMs;
 
     private final long startTimeMs = System.currentTimeMillis();
+
+    /** Значения по умолчанию — как было раньше (0.3с появление, 2с держим, 0.5с исчезновение). */
+    public FadeTimer() {
+        this(300, 2000, 500);
+    }
+
+    public FadeTimer(long fadeInMs, long holdMs, long fadeOutMs) {
+        this.fadeInMs = fadeInMs;
+        this.holdMs = holdMs;
+        this.fadeOutMs = fadeOutMs;
+        this.totalDurationMs = fadeInMs + holdMs + fadeOutMs;
+    }
 
     public float getAlpha() {
         long elapsed = System.currentTimeMillis() - startTimeMs;
 
-        if (elapsed < FADE_IN_MS) {
-            return elapsed / (float) FADE_IN_MS;
+        if (elapsed < fadeInMs) {
+            return elapsed / (float) fadeInMs;
         }
-        if (elapsed < FADE_IN_MS + HOLD_MS) {
+        if (elapsed < fadeInMs + holdMs) {
             return 1.0f;
         }
-        long fadeOutElapsed = elapsed - FADE_IN_MS - HOLD_MS;
-        if (fadeOutElapsed < FADE_OUT_MS) {
-            return 1.0f - (fadeOutElapsed / (float) FADE_OUT_MS);
+        long fadeOutElapsed = elapsed - fadeInMs - holdMs;
+        if (fadeOutElapsed < fadeOutMs) {
+            return 1.0f - (fadeOutElapsed / (float) fadeOutMs);
         }
         return 0.0f;
     }
 
     public boolean isFinished() {
-        return System.currentTimeMillis() - startTimeMs >= TOTAL_DURATION_MS;
+        return System.currentTimeMillis() - startTimeMs >= totalDurationMs;
     }
 }

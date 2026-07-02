@@ -10,7 +10,7 @@ public class DamageNotification {
 
     private final Component targetName;
     private final float damageInHealthPoints;
-    private final FadeTimer timer = new FadeTimer();
+    private final FadeTimer timer = new FadeTimer(300, 60_000, 1000);
 
     public DamageNotification(Component targetName, float damageInHealthPoints) {
         this.targetName = targetName;
