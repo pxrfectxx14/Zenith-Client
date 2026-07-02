@@ -41,7 +41,7 @@ public class BiomeNotifierFeature extends ClientFeature {
 
         if (biomeChanged) {
             if (lastBiome != null) {
-                activeNotification = new FadingNotification(formatBiomeName(biome));
+                activeNotification = new FadingNotification(formatBiomeName(biome), BiomeColors.get(biome));
             }
             lastBiome = biome;
         }

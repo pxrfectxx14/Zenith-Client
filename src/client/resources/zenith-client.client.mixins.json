@@ -3,7 +3,8 @@
 	"package": "dev.zenith.client.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"ExampleClientMixin"
+		"ExampleClientMixin",
+      "AbstractContainerScreenAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1
