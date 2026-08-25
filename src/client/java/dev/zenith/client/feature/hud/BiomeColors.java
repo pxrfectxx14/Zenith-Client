@@ -2,16 +2,15 @@ package dev.zenith.client.feature.hud;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
-
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Ручное сопоставление "биом → цвет текста уведомления".
- * Ключ — технический id биома без пространства имён (то, что видно
- * в /locate или в NBT, например "plains", "desert", "dark_forest").
- * Чтобы поменять или добавить цвет — просто впиши/измени строку ниже.
- * Формат цвета — RGB в hex, например 0xFF0000 — красный.
+  Ручное сопоставление "биом → цвет текста уведомления".
+  Ключ — технический id биома без пространства имён (то, что видно
+  в /locate или в NBT, например "plains", "desert", "dark_forest").
+  Чтобы поменять или добавить цвет — просто впиши/измени строку ниже.
+  Формат цвета — RGB в hex, например 0xFF0000 — красный.
  */
 public final class BiomeColors {
 

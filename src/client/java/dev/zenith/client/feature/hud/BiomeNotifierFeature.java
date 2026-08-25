@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
-
 import java.util.Optional;
 
 /**
@@ -21,9 +20,9 @@ public class BiomeNotifierFeature extends ClientFeature {
     }
 
     /**
-     * Вызывается каждый игровой тик. Сравнивает текущий биом с предыдущим
-     * и, если он изменился, запускает новое уведомление.
-     */
+      Вызывается каждый игровой тик. Сравнивает текущий биом с предыдущим и,
+      если он изменился, запускает новое уведомление.
+     **/
     public void onClientTick(Minecraft client) {
         if (client.level == null || client.player == null) {
             return;
@@ -61,9 +60,9 @@ public class BiomeNotifierFeature extends ClientFeature {
     }
 
     /**
-     * Возвращает активное уведомление для отрисовки, если оно есть и ещё не истекло.
-     * Автоматически "забывает" уведомление, когда его анимация полностью завершилась.
-     */
+      Возвращает активное уведомление для отрисовки, если оно есть и ещё не истекло.
+      Автоматически "забывает" уведомление, когда его анимация полностью завершилась.
+     **/
     public Optional<FadingNotification> getActiveNotification() {
         if (activeNotification != null && activeNotification.isFinished()) {
             activeNotification = null;

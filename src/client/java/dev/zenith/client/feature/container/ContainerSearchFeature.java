@@ -4,13 +4,26 @@ import dev.zenith.client.feature.ClientFeature;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * Хранит текущий поисковый запрос и решает, подходит ли под него предмет.
+ * Хранит текущий поисковый запрос, режим отображения результата,
+ * и решает, подходит ли под запрос предмет.
  * Ничего не знает об экранах, слотах и отрисовке — это отдельная ответственность,
- * которую возьмёт на себя код связи с экраном (следующий шаг).
+ * которую берёт на себя код связи с экраном.
  */
 public class ContainerSearchFeature extends ClientFeature {
 
+    /**
+     * HIGHLIGHT — совпадения обводятся рамкой, остальные предметы не трогаются.
+     * FILTER — совпадения остаются чёткими, все остальные предметы затемняются,
+     * создавая эффект "отфильтрованного" списка (сами слоты не двигаются —
+     * физически убрать предмет из чужой позиции в контейнере нельзя).
+     */
+    public enum SearchMode {
+        HIGHLIGHT,
+        FILTER
+    }
+
     private String query = "";
+    private SearchMode mode = SearchMode.HIGHLIGHT;
 
     public ContainerSearchFeature() {
         super("container_search", true);
@@ -22,6 +35,15 @@ public class ContainerSearchFeature extends ClientFeature {
 
     public String getQuery() {
         return query;
+    }
+
+    public SearchMode getMode() {
+        return mode;
+    }
+
+    /** Переключает режим по кругу: HIGHLIGHT -> FILTER -> HIGHLIGHT -> ... */
+    public void cycleMode() {
+        mode = (mode == SearchMode.HIGHLIGHT) ? SearchMode.FILTER : SearchMode.HIGHLIGHT;
     }
 
     /**
