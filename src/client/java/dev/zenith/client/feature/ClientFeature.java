@@ -4,7 +4,7 @@ package dev.zenith.client.feature;
  * Базовый класс для всех фич мода.
  * Каждая фича (HUD-элемент, поиск в сундуках и т.д.) наследуется от него.
  */
-public abstract class ClientFeature {
+public abstract class ClientFeature implements Toggleable {
 
     private final String name;
     private boolean enabled;
@@ -16,6 +16,11 @@ public abstract class ClientFeature {
 
     public String getName() {
         return name;
+    }
+
+    /** Отображаемое название фичи для UI, на текущем выбранном языке (см. {@link Lang}). */
+    public String getDisplayName() {
+        return FeatureTranslations.get(name, Lang.current());
     }
 
     public boolean isEnabled() {

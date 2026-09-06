@@ -4,7 +4,9 @@
 	"compatibilityLevel": "JAVA_21",
 	"client": [
 		"ExampleClientMixin",
-      "AbstractContainerScreenAccessor"
+      "AbstractContainerScreenAccessor",
+      "GuiGraphicsLabelColorMixin",
+      "ContainerLabelColorMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

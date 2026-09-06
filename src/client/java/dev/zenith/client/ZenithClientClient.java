@@ -3,6 +3,7 @@ package dev.zenith.client;
 import dev.zenith.client.feature.FeatureManager;
 import dev.zenith.client.feature.hud.BiomeNotifierFeature;
 import dev.zenith.client.feature.hud.DamageIndicatorFeature;
+import dev.zenith.client.menu.ZenithKeybinds;
 import dev.zenith.client.feature.hud.DamageNotification;
 import dev.zenith.client.feature.hud.FadingNotification;
 import dev.zenith.client.feature.hud.GameClockFeature;
@@ -10,6 +11,7 @@ import dev.zenith.client.feature.particles.AtmosphericParticlesFeature;
 import dev.zenith.client.feature.hud.PvpHitsCounterFeature;
 import dev.zenith.client.feature.container.ContainerSearchFeature;
 import dev.zenith.client.feature.interfacefx.CursorTrailFeature;
+import dev.zenith.client.ZenithResourcePacks;
 import dev.zenith.client.feature.interfacefx.CursorTrailScreenHandler;
 import dev.zenith.client.feature.hud.CoordinatesFeature;
 import dev.zenith.client.feature.container.ContainerSearchScreenHandler;
@@ -32,6 +34,23 @@ public class ZenithClientClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+
+        ClientTickEvents.END_CLIENT_TICK.register(new ClientTickEvents.EndTick() {
+            private boolean printed = false;
+
+            @Override
+            public void onEndTick(Minecraft client) {
+                if (printed) return;
+                printed = true;
+                System.out.println("Available pack ids: " + client.getResourcePackRepository().getAvailableIds());
+            }
+        });
+
+        ZenithKeybinds.register();
+        ClientTickEvents.END_CLIENT_TICK.register(ZenithKeybinds::tick);
+
+        ZenithResourcePacks.register();
+
         GameClockFeature gameClock = new GameClockFeature();
         FeatureManager.register(gameClock);
 
@@ -60,6 +79,7 @@ public class ZenithClientClient implements ClientModInitializer {
         ContainerSearchFeature containerSearch = new ContainerSearchFeature();
         FeatureManager.register(containerSearch);
         ContainerSearchScreenHandler.register(containerSearch);
+
 
         // Каждый тик даём фичам обновить своё внутреннее состояние
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -92,6 +112,7 @@ public class ZenithClientClient implements ClientModInitializer {
         registerBiomeNotificationHud(biomeNotifier);
         registerDamageIndicatorHud(damageIndicator);
     }
+
 
     private void registerGameClockHud(GameClockFeature gameClock, RealTimeClockFeature realTimeClock) {
         HudElementRegistry.addLast(

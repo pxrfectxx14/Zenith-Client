@@ -1,13 +1,16 @@
 {
 	"required": true,
-	"package": "dev.zenith.mixin",
+  "package": "dev.zenith.client.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ExampleMixin"
+
 	],
 	"injectors": {
 		"defaultRequire": 1
 	},
+    "client": [
+    "ContainerLabelColorMixin"
+    ],
 	"overwrites": {
 		"requireAnnotations": true
 	}
